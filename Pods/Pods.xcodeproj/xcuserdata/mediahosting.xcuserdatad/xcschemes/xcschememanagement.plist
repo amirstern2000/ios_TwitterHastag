@@ -4,11 +4,6 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>FHSTwitterEngine.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Pods-Twitter Hastags.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -37,7 +32,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>801269A81A8A4BA7C54D75E7AB33C778</key>
+		<key>6E189835EB5ECFF6DD8D83BD316EA1B1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7A02399E2A2A95BD58EEC306C0EB50EB</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -47,22 +47,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>8E79A813B94DFB3C7AE5873014167AAD</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
 		<key>C756D143FF1D5E734D4C93858F44DF4C</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>D7E6F1B03641FBD3DA8BEFE7F3B9F812</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>E3974B03793DB49E3A2DC667DA1A586D</key>
+		<key>EC9582462EF5D1A3D3F333F9431A3DFE</key>
 		<dict>
 			<key>primary</key>
 			<true/>

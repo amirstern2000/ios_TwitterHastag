@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "HashTag.h"
 
-@interface TweetsViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface TweetsViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (strong, nonatomic) HashTag *hashTag;

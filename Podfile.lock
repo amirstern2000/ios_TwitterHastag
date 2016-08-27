@@ -1,20 +1,17 @@
 PODS:
-  - FHSTwitterEngine (2.0.2)
   - SDWebImage (3.8.1):
     - SDWebImage/Core (= 3.8.1)
   - SDWebImage/Core (3.8.1)
   - STTwitter (0.2.4)
 
 DEPENDENCIES:
-  - FHSTwitterEngine
   - SDWebImage
   - STTwitter
 
 SPEC CHECKSUMS:
-  FHSTwitterEngine: f431cd4057e74336d3869023987b2136d9322061
   SDWebImage: 35f9627a3e44b4f292a8a8ce6a531fa488239b91
   STTwitter: a82de278afbd4191d0a07f4f3ffd8f1fb8404da0
 
-PODFILE CHECKSUM: 9e0f8f77139a5cd91e3de9c9758dcfd51c03696f
+PODFILE CHECKSUM: 8ceced43ae16672b8ef11625d5c18b270979eb2e
 
 COCOAPODS: 1.0.1

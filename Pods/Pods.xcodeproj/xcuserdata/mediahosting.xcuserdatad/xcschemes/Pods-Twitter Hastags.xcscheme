@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'D7E6F1B03641FBD3DA8BEFE7F3B9F812'
+               BlueprintIdentifier = 'EC9582462EF5D1A3D3F333F9431A3DFE'
                BlueprintName = 'Pods-Twitter Hastags'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'libPods-Twitter Hastags.a'>

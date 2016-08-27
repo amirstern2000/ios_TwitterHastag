@@ -30,6 +30,7 @@
 +(void)saveoOuthToken:(NSString *)oauthToken andOauthTokenSecret:(NSString *)oauthTokenSecret;
 +(void)saveRefrasheRate:(NSInteger)refreshRate;
 -(void)searchHasTag:(NSString *)hashTag;
+-(void)searchForOldTweets;
 -(void)startTimer;
 -(void)stopTimer;
 
@@ -47,5 +48,5 @@
 -(void)onSearchSucces;
 -(void)onSearchFail:(NSString *)error;
 -(void)onSearchUpdate:(NSInteger)addedTweets;
-
+-(void)onSearchOldTweets:(NSInteger)addedTweets position:(NSInteger)position;
 @end

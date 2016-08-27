@@ -91,7 +91,7 @@
         [self createAlertView:@"hashtag need to start with '#'"];
         return;
     }
-    
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [hashTag searchHasTag:[searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
     [activityIndicator startAnimating];
         
@@ -120,6 +120,14 @@
     [cell setTweetCell:tweetDic];
     return cell;
 }
+
+-(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.row == hashTag.hasTags.count - 1){
+        
+        [hashTag searchForOldTweets];
+    }
+}
+
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return [self heightForBasicCellAtIndexPath:indexPath];
@@ -168,6 +176,7 @@
     [activityIndicator stopAnimating];
     [tweetsTableView reloadData];
     NSLog(@"search success");
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     
 }
 
@@ -175,6 +184,7 @@
     [activityIndicator stopAnimating];
     NSLog(@"shearch fail");
     [self createAlertView:error];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
 
 -(void)onSearchUpdate:(NSInteger)addedTweets{
@@ -184,6 +194,16 @@
         indexPathes[i] = [NSIndexPath indexPathForRow:i inSection:0];
     }
     [tweetsTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationFade];
+}
+
+-(void)onSearchOldTweets:(NSInteger)addedTweets position:(NSInteger)position{
+    NSMutableArray *indexPathes = [[NSMutableArray alloc] initWithCapacity:addedTweets];
+    for (NSInteger i = 0; i < addedTweets; i++){
+        indexPathes[i] = [NSIndexPath indexPathForRow:position inSection:0];
+        position++;
+    }
+    [tweetsTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationFade];
+    
 }
 
 

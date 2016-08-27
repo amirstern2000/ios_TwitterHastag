@@ -8,8 +8,11 @@
 
 #import "HashTag.h"
 
-@implementation HashTag
+@implementation HashTag{
+    BOOL isSearchOld;
+}
 @synthesize hasTags,hasTagTimer,delegate;
+
 
 #pragma mark - initlize
 -(id)initWithDelegate:(id)_delegate{
@@ -79,6 +82,7 @@ static STTwitterAPI *shareTwitterAPI = nil;
      
         } else {
             // search succesd
+            NSLog(@"id_str: %@",statuses[statuses.count-1][@"id_str"]);
             if (hasTags == nil){
                 hasTags = [[NSMutableArray alloc] initWithArray:statuses copyItems:YES];
             } else {
@@ -99,6 +103,42 @@ static STTwitterAPI *shareTwitterAPI = nil;
      
      }];
     
+    
+}
+
+-(void)searchForOldTweets{
+    if (!isSearchOld){
+        NSLog(@"search old tweets");
+        isSearchOld = YES;
+        [self stopTimer];
+        [[HashTag shareTwitterAPI] getSearchTweetsWithQuery:self.hashTag
+                                                    geocode:nil lang:nil
+                                                     locale:nil
+                                                 resultType:@"recent"
+                                                      count:@"15"
+                                                      until:nil
+                                                    sinceID:nil
+                                                      maxID:hasTags[hasTags.count-1][@"id_str"]
+          includeEntities:@YES callback:nil successBlock:^(NSDictionary *searchMetadata, NSArray *statuses)
+        {
+           
+            if (statuses.count > 1){
+                [hasTags removeLastObject];
+                [hasTags addObjectsFromArray:statuses];
+                [self.delegate onSearchOldTweets:statuses.count-1 position:hasTags.count-statuses.count+1];
+            }
+            [self startTimer];
+            isSearchOld = NO;
+           // [hasTags removeLastObject];
+            //[hasTags addObjectsFromArray:statuses];
+            //hasTags addObjectsFromArray:<#(nonnull NSArray *)#>
+            //self.delegate onSearchOldTweets:statuses.count position:<#(NSInteger)#>
+            
+        } errorBlock:^(NSError *error) {
+            [self startTimer];
+            isSearchOld = NO;
+        }];
+    }
     
 }
 
