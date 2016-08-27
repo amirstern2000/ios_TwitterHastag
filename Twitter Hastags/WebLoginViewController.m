@@ -7,6 +7,7 @@
 //
 
 #import "WebLoginViewController.h"
+#import "HashTag.h"
 
 @interface WebLoginViewController ()
 
@@ -37,6 +38,7 @@
 - (IBAction)cancel:(id)sender {
     [self dismissViewControllerAnimated:YES completion:^{
         //
+        [HashTag resetShareTwitterAPI];
     }];
 }
 @end

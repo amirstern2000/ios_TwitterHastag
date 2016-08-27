@@ -138,18 +138,21 @@
 
 #pragma mark - HastTag delegate
 -(void)onSearchSucces{
+    [tweetsTableView setHidden:NO];
     [activityIndicator stopAnimating];
     [tweetsTableView reloadData];
     NSLog(@"search success");
     
 }
 
--(void)onSearchFail{
+-(void)onSearchFail:(NSString *)error{
     [activityIndicator stopAnimating];
     NSLog(@"shearch fail");
+    [self createAlertView:error];
 }
 
 -(void)onSearchUpdate:(NSInteger)addedTweets{
+    
     NSMutableArray *indexPathes = [[NSMutableArray alloc] initWithCapacity:addedTweets];
     for (NSInteger i = 0; i < addedTweets; i++) {
         indexPathes[i] = [NSIndexPath indexPathForRow:i inSection:0];
@@ -157,4 +160,26 @@
     [tweetsTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationFade];
 }
 
+- (IBAction)logout:(id)sender {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout?" preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [HashTag resetShareTwitterAPI];
+        }];
+    }];
+    
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleDestructive handler:nil];
+    [alertController addAction:yesAction];
+    [alertController addAction:noAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+}
+
+-(void)createAlertView:(NSString *) message{
+    UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"Twitter Hashtags" message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+    [alertView addAction:okAction];
+    [self presentViewController:alertView animated:YES completion:nil];
+}
 @end

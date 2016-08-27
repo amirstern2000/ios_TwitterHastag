@@ -16,10 +16,12 @@
 # define CONSUMER_SECRET @"n0p5inm0FfAN2KDJ3WiKSbuNAtJEN0gwvnrUwUcBJXdmuZflNO"
 @interface ViewController : UIViewController
 
+@property (weak, nonatomic) IBOutlet UITextField *refreshRateTextField;
 @property (strong, nonatomic) TweetsViewController *tweetsViewController;
 @property (strong, nonatomic) WebLoginViewController *webLoginVC;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 - (IBAction)loginTwitter:(id)sender;
+- (IBAction)clearKeyboard:(id)sender;
 
 - (void)setOAuthToken:(NSString *)token oauthVerifier:(NSString *)verifier;
 @end

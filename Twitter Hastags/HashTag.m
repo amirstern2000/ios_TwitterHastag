@@ -7,7 +7,6 @@
 //
 
 #import "HashTag.h"
-#import <FHSTwitterEngine.h>
 
 @implementation HashTag
 @synthesize hasTags,hasTagTimer,delegate;
@@ -22,22 +21,31 @@
     return self;
 }
 
+static STTwitterAPI *shareTwitterAPI = nil;
+
 +(STTwitterAPI *)shareTwitterAPI{
-    static STTwitterAPI *twitterAPI = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
+    if (shareTwitterAPI == nil){
         NSUserDefaults  *userDefaults = [NSUserDefaults standardUserDefaults];
         NSString *oauthToken = [userDefaults stringForKey:OAUTH_TOKEN_KEY];
         NSString *oauthTokenSecret = [userDefaults stringForKey:OAUTH_TOKEN_SECRET_KEY];
         if (oauthTokenSecret == nil && oauthToken == nil){
             // user not login
-            twitterAPI = [STTwitterAPI twitterAPIWithOAuthConsumerKey:CONSUMER_KEY
-                                                       consumerSecret:CONSUMER_SECRET];
+            shareTwitterAPI = [STTwitterAPI twitterAPIWithOAuthConsumerKey:CONSUMER_KEY
+                                                            consumerSecret:CONSUMER_SECRET];
         } else {
-            twitterAPI = [STTwitterAPI twitterAPIWithOAuthConsumerKey:CONSUMER_KEY consumerSecret:CONSUMER_SECRET oauthToken:oauthToken oauthTokenSecret:oauthTokenSecret];
+            shareTwitterAPI = [STTwitterAPI twitterAPIWithOAuthConsumerKey:CONSUMER_KEY consumerSecret:CONSUMER_SECRET oauthToken:oauthToken oauthTokenSecret:oauthTokenSecret];
         }
-    });
-    return twitterAPI;
+        
+    }
+    return shareTwitterAPI;
+}
+
++(void)resetShareTwitterAPI{
+    shareTwitterAPI = nil;
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults removeObjectForKey:OAUTH_TOKEN_KEY];
+    [userDefaults removeObjectForKey:OAUTH_TOKEN_SECRET_KEY];
+    [userDefaults synchronize];
 }
 
 +(void)saveoOuthToken:(NSString *)oauthToken andOauthTokenSecret:(NSString *)oauthTokenSecret{
@@ -47,32 +55,59 @@
     [userDefaults synchronize];
 }
 
++(void)saveRefrasheRate:(NSInteger)refreshRate{
+    if (refreshRate > 0){
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setInteger:refreshRate forKey:REFRESH_RATE_KEY];
+        [userDefaults synchronize];
+    }
+}
+
 #pragma mark - public methods
 -(void)searchHasTag:(NSString *)hashTag{
     self.hashTag = hashTag;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      
-        [[HashTag shareTwitterAPI] getSearchTweetsWithQuery:self.hashTag successBlock:^(NSDictionary *searchMetadata, NSArray *statuses) {
-            // search succesd
-            hasTags = [[NSMutableArray alloc] initWithArray:statuses copyItems:YES];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self startTimer];
-                [delegate onSearchSucces];
-            });
-            
-        } errorBlock:^(NSError *error) {
+    [self stopTimer];
+    
+    [[HashTag shareTwitterAPI] getSearchTweetsWithQuery:self.hashTag
+    successBlock:^(NSDictionary *searchMetadata, NSArray *statuses)
+    {
+        if (statuses.count == 0){
             // search fail
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [delegate onSearchFail];
-            });
-        }];
-        
-    });
+            [delegate onSearchFail:[NSString stringWithFormat:@"Didn't find any tweets for %@",self.hashTag]];
+     
+        } else {
+            // search succesd
+            if (hasTags == nil){
+                hasTags = [[NSMutableArray alloc] initWithArray:statuses copyItems:YES];
+            } else {
+                [hasTags removeAllObjects];
+                [hasTags insertObjects:statuses atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, statuses.count)]];
+            }
+     
+     
+        [self startTimer];
+        [delegate onSearchSucces];
+     
+      }
+     
+     
+  } errorBlock:^(NSError *error) {
+      // search fail
+      [delegate onSearchFail:error.localizedDescription];
+     
+     }];
+    
+    
 }
 
 -(void)startTimer{
-    if (hasTagTimer == nil)
-        hasTagTimer = [NSTimer scheduledTimerWithTimeInterval:15 target:self selector:@selector(refreshHasTags) userInfo:nil repeats:YES];
+    if (hasTagTimer == nil){
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSInteger refreshRate = [userDefaults integerForKey:REFRESH_RATE_KEY];
+        hasTagTimer = [NSTimer
+                       scheduledTimerWithTimeInterval: (refreshRate == 0 ? DEFAULT_REFRESH_RATE : refreshRate)
+                       target:self selector:@selector(refreshHasTags) userInfo:nil repeats:YES];
+    }
 }
 
 -(void)stopTimer{
@@ -85,33 +120,31 @@
 #pragma mark - private methods
 -(void)refreshHasTags{
     NSLog(@"refresh tweets");
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0), ^{
-        [[HashTag shareTwitterAPI] getSearchTweetsWithQuery:self.hashTag
-                                                    geocode:@""
-                                                       lang:@""
-                                                     locale:@""
-                                                 resultType:@"recent"
-                                                      count:@"15"
-                                                      until:@""
-                                                    sinceID:hasTags[0][@"id_str"]
-                                                      maxID:@""
-                                            includeEntities:@YES
-          callback:nil successBlock:^(NSDictionary *searchMetadata, NSArray *statuses) {
-              
-              if (statuses.count > 0){
-                  NSLog(@"new tweets");
-                  [hasTags insertObjects:statuses atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, statuses.count)]];
-                  dispatch_async(dispatch_get_main_queue(), ^{
-                      [delegate onSearchUpdate:statuses.count];
-                  });
-              }
-              
-            
-        } errorBlock:^(NSError *error) {
-            NSLog(@"%@",error);
-        }];
-        
-    });
+    
+    [[HashTag shareTwitterAPI] getSearchTweetsWithQuery:self.hashTag
+                                                geocode:@""
+                                                   lang:@""
+                                                 locale:@""
+                                             resultType:@"recent"
+                                                  count:@"15"
+                                                  until:@""
+                                                sinceID:hasTags[0][@"id_str"]
+                                                  maxID:@""
+                                        includeEntities:@YES
+                                               callback:nil successBlock:^(NSDictionary *searchMetadata, NSArray *statuses) {
+                                                   
+                                                   if (statuses.count > 0){
+                                                       NSLog(@"new tweets");
+                                                       [hasTags insertObjects:statuses atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, statuses.count)]];
+                                                       [delegate onSearchUpdate:statuses.count];
+                                                   }
+                                                   
+                                                   
+                                               } errorBlock:^(NSError *error) {
+                                                   NSLog(@"%@",error);
+                                               }];
+    
+    
     
 }
 @end

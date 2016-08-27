@@ -15,4 +15,6 @@
 @property (strong, nonatomic) HashTag *hashTag;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) IBOutlet UITableView *tweetsTableView;
+
+- (IBAction)logout:(id)sender;
 @end

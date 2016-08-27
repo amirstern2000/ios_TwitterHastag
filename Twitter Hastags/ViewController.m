@@ -16,7 +16,7 @@
 @end
 
 @implementation ViewController
-@synthesize activityIndicator,tweetsViewController;
+@synthesize activityIndicator,tweetsViewController,refreshRateTextField;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.webLoginVC = [self.storyboard instantiateViewControllerWithIdentifier:@"WebLoginViewController"];
@@ -39,6 +39,11 @@
 # pragma mark - event methods
 - (IBAction)loginTwitter:(id)sender {
     
+    NSInteger rate;
+    if ([refreshRateTextField.text isEqualToString:@""])
+        rate = 0;
+    rate = refreshRateTextField.text.integerValue;
+    
     [[HashTag shareTwitterAPI] postTokenRequest:^(NSURL *url, NSString *oauthToken) {
         [self presentViewController:self.webLoginVC animated:YES completion:^{
             NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -52,15 +57,23 @@
                      oauthCallback:@"twitterhastags://twitter_access_tokens/"
                         errorBlock:^(NSError *error) {
                             NSLog(@"-- error: %@", error);
+                            [self createAlertView:error.localizedDescription];
         
     }];
     
    
 }
 
+- (IBAction)clearKeyboard:(id)sender {
+    [refreshRateTextField resignFirstResponder];
+}
+
 -(void)displaySearchTweetViewControll{
     NSLog(@"display twitter search tweet by hastags");
-    [self.navigationController pushViewController:tweetsViewController animated:YES];
+    [self presentViewController:tweetsViewController animated:YES completion:^{
+        [tweetsViewController.tweetsTableView setHidden:YES];
+    }];
+  
     
 }
 
@@ -95,6 +108,7 @@
         
         
         NSLog(@"-- %@", [error localizedDescription]);
+        [self createAlertView:error.localizedDescription];
     }];
 }
 
@@ -106,12 +120,12 @@
 }
 
 -(void)resoteLogin{
-    /*NSUserDefaults  *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults  *userDefaults = [NSUserDefaults standardUserDefaults];
     NSString *oauthToken = [userDefaults stringForKey:OAUTH_TOKEN_KEY];
     NSString *oauthTokenSecret = [userDefaults stringForKey:OAUTH_TOKEN_SECRET_KEY];
     if (oauthTokenSecret == nil && oauthToken == nil){
-        // user not login
-    } else {*/
+         //user not login
+    } else {
        
         [[HashTag shareTwitterAPI] verifyCredentialsWithUserSuccessBlock:^(NSString *username, NSString *userID) {
             // user is sing in - move to tweets page
@@ -120,12 +134,20 @@
         } errorBlock:^(NSError *error) {
             // user is not login
             NSLog(@"verifiy aouth error: %@",error);
+            [self createAlertView:error.localizedDescription];
         }];
         
         
-   // }
+   }
     
  
+}
+
+-(void)createAlertView:(NSString *) message{
+    UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"Twitter Hashtags" message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+    [alertView addAction:okAction];
+    [self presentViewController:alertView animated:YES completion:nil];
 }
 
 @end
