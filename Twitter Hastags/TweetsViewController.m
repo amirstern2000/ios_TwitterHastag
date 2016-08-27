@@ -175,6 +175,7 @@
     [tweetsTableView setHidden:NO];
     [activityIndicator stopAnimating];
     [tweetsTableView reloadData];
+    [tweetsTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     NSLog(@"search success");
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     
@@ -202,7 +203,8 @@
         indexPathes[i] = [NSIndexPath indexPathForRow:position inSection:0];
         position++;
     }
-    [tweetsTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationFade];
+    [tweetsTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationBottom];
+    [tweetsTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:((NSIndexPath *)indexPathes[0]).row-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     
 }
 
