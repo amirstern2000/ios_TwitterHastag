@@ -28,10 +28,14 @@
 +(STTwitterAPI *)shareTwitterAPI;
 +(void)resetShareTwitterAPI;
 +(void)saveoOuthToken:(NSString *)oauthToken andOauthTokenSecret:(NSString *)oauthTokenSecret;
++(void)saveRefrasheRate:(NSInteger)refreshRate;
 -(void)searchHasTag:(NSString *)hashTag;
 -(void)startTimer;
 -(void)stopTimer;
 
+-(BOOL) isSearchEmpty:(NSString *)search;
+-(BOOL) isSearchIsHastag:(NSString *)search;
++(BOOL) isSearchRateIsValid:(NSString *)rate;
 
 
 

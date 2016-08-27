@@ -21,6 +21,8 @@
     return self;
 }
 
+# pragma mark - Twitter API
+
 static STTwitterAPI *shareTwitterAPI = nil;
 
 +(STTwitterAPI *)shareTwitterAPI{
@@ -117,7 +119,7 @@ static STTwitterAPI *shareTwitterAPI = nil;
     }
 }
 
-#pragma mark - private methods
+#pragma mark - timer triger
 -(void)refreshHasTags{
     NSLog(@"refresh tweets");
     
@@ -147,4 +149,24 @@ static STTwitterAPI *shareTwitterAPI = nil;
     
     
 }
+
+# pragma mark - input validation
+-(BOOL) isSearchEmpty:(NSString *)search{
+    return [[search stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@""];
+}
+
+-(BOOL) isSearchIsHastag:(NSString *)search{
+    return [search hasPrefix:@"#"];
+}
+
++(BOOL) isSearchRateIsValid:(NSString *)rate{
+    
+    if ([rate isEqualToString:@""]) // will use DEFAULT_REFRESH_RATE 30
+        return YES;
+    NSInteger rateInt = rate.integerValue;
+    return (rateInt > 0 && rateInt <= 60);
+    
+}
+
+
 @end

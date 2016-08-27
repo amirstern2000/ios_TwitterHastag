@@ -46,6 +46,23 @@
     // Pass the selected object to the new view controller.
 }
 */
+#pragma mark - Logut Button
+
+- (IBAction)logout:(id)sender {
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout?" preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [HashTag resetShareTwitterAPI];
+        }];
+    }];
+    
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleDestructive handler:nil];
+    [alertController addAction:yesAction];
+    [alertController addAction:noAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+    
+}
 
 #pragma mark - UISearchBarDelegate
 -(void)searchBarTextDidEndEditing:(UISearchBar *)searchBar{
@@ -63,14 +80,23 @@
 }
 
 -(void) searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    [searchBar setShowsCancelButton:YES];
     [searchBar resignFirstResponder];
-    if (![searchBar.text isEqualToString:@""]){
-        [searchBar setShowsCancelButton:YES];
-        [hashTag searchHasTag:searchBar.text];
-        [activityIndicator startAnimating];
-        
-        
+    if ([hashTag isSearchEmpty:searchBar.text]){
+        [self createAlertView:@"Search is empty"];
+        return;
     }
+    
+    if (![hashTag isSearchIsHastag:searchBar.text]){
+        [self createAlertView:@"hashtag need to start with '#'"];
+        return;
+    }
+    
+    [hashTag searchHasTag:[searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+    [activityIndicator startAnimating];
+        
+        
+    
     
 }
 
@@ -160,21 +186,7 @@
     [tweetsTableView insertRowsAtIndexPaths:indexPathes withRowAnimation:UITableViewRowAnimationFade];
 }
 
-- (IBAction)logout:(id)sender {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout?" preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self dismissViewControllerAnimated:YES completion:^{
-            [HashTag resetShareTwitterAPI];
-        }];
-    }];
-    
-    UIAlertAction *noAction = [UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleDestructive handler:nil];
-    [alertController addAction:yesAction];
-    [alertController addAction:noAction];
-    
-    [self presentViewController:alertController animated:YES completion:nil];
-    
-}
+
 
 -(void)createAlertView:(NSString *) message{
     UIAlertController *alertView = [UIAlertController alertControllerWithTitle:@"Twitter Hashtags" message:message preferredStyle:UIAlertControllerStyleAlert];

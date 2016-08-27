@@ -2,7 +2,7 @@
 //  TweetCell.m
 //  Twitter Hastags
 //
-//  Created by MediaHosting LTD on 25/08/2016.
+//  Created by AmirStern on 25/08/2016.
 //  Copyright © 2016 AmirStern. All rights reserved.
 //
 
@@ -25,7 +25,7 @@
 -(void)setTweetCell:(NSDictionary *)tweetDic{
     
     // set user image
-    NSURL *userImageUrl = [NSURL URLWithString:tweetDic[@"user"][@"profile_image_url_https"]];
+    NSURL *userImageUrl = [NSURL URLWithString:[tweetDic[@"user"][@"profile_image_url_https"] stringByReplacingOccurrencesOfString:@"normal" withString:@"bigger"]];
     [self.userImageView sd_setImageWithURL:userImageUrl placeholderImage:nil];
     
     // set user name
@@ -44,39 +44,43 @@
     self.tweetLabel.attributedText = tweetString;
     
     // set tweet date
-    NSDate *tweetDate = [[TweetCell twitterDateFormattor] dateFromString:tweetDic[@"created_at"]];
-    NSDate *date = [NSDate date];
-    NSTimeInterval time = [date timeIntervalSinceDate:tweetDate];
-     NSUInteger unitFlags  = NSCalendarUnitYear | NSCalendarUnitDay | NSCalendarUnitHour;
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [calendar components:unitFlags fromDate:tweetDate toDate:date options:0];
-    NSInteger year = components.year;
-    
-    
-    if (time < SECONDS_IN_MINUTE){
-        // just now
-        self.dateLabel.text = @"Just now";
-    } else if (time <  SECONDS_IN_HOUR){
-        // 5 min
-        self.dateLabel.text = [NSString stringWithFormat:@"%d min",(int)(time/SECONDS_IN_MINUTE)];
-    } else if (time < SECONDS_IN_DAY){
-        // 2 hour/s
-        int hours = (int)(time/(SECONDS_IN_HOUR));
-        self.dateLabel.text = [NSString stringWithFormat:@"%d %@",hours,hours == 1 ? @"hour" : @"hours"];
-    } else if (year < 1) {
-        // Agoust 21
-        self.dateLabel.text = [[TweetCell monthDateFormatter] stringFromDate:tweetDate];
-    } else {
-        // Agoust 21, 2016
-        self.dateLabel.text = [[TweetCell yearDateFormatter] stringFromDate:tweetDate];
-    }
-    //self.dateLabel.text = tweetDic[@"created_at"];
+    self.dateLabel.text = [self checkDateType:[[TweetCell twitterDateFormattor] dateFromString:tweetDic[@"created_at"]]nowDate:[NSDate date]];
     
     if (self.tweetImageView != nil){
         // set tweet image
         NSURL *imageUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@:small",tweetDic[@"extended_entities"][@"media"][0][@"media_url_https"]]];
         [self.tweetImageView sd_setImageWithURL:imageUrl placeholderImage:nil];
     }
+}
+
+-(NSString *) checkDateType:(NSDate *)tweetDate nowDate:(NSDate *) date{
+    
+    NSTimeInterval time = [date timeIntervalSinceDate:tweetDate];
+    NSUInteger unitFlags  = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay ;
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *tweetsComponents = [calendar components:unitFlags fromDate:tweetDate];
+    NSDateComponents *nowComponents = [calendar components:unitFlags fromDate:date];
+    
+    if (tweetsComponents.year < nowComponents.year){
+        // e.g. Aug 21, 2016
+        return [[TweetCell yearDateFormatter] stringFromDate:tweetDate];
+    } else if (tweetsComponents.day < nowComponents.day || tweetsComponents.month < nowComponents.month){
+        // e.g. Aug 21
+        return [[TweetCell monthDateFormatter] stringFromDate:tweetDate];
+    } else {
+        if (time < SECONDS_IN_MINUTE){
+            // e.g. just now
+            return @"Just now";
+        } else if (time <  SECONDS_IN_HOUR){
+            // e.g. 5 min
+            return [NSString stringWithFormat:@"%d min",(int)(time/SECONDS_IN_MINUTE)];
+        } else {
+            // e.g. 2 hours
+            int hours = (int)(time/(SECONDS_IN_HOUR));
+            return [NSString stringWithFormat:@"%d %@",hours,hours == 1 ? @"hour" : @"hours"];
+        }
+    }
+
 }
 
 +(NSDateFormatter *)twitterDateFormattor{

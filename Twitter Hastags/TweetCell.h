@@ -2,7 +2,7 @@
 //  TweetCell.h
 //  Twitter Hastags
 //
-//  Created by MediaHosting LTD on 25/08/2016.
+//  Created by AmirStern on 25/08/2016.
 //  Copyright © 2016 AmirStern. All rights reserved.
 //
 
@@ -22,3 +22,5 @@
 
 -(void)setTweetCell:(NSDictionary *)tweetDic;
 @end
+
+

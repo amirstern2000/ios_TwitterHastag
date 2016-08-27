@@ -45,12 +45,15 @@
 
 -(BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString *,id> *)options{
     
+    // check if URL scheme is match to Twitter Login WebView
     if ([[url scheme] isEqualToString:@"twitterhastags"] == NO) return NO;
     
+    // parse query parameters to NSDictionary
     NSDictionary *d = [self parametersDictionaryFromQueryString:[url query]];
     
     NSString *token = d[@"oauth_token"];
     NSString *verifier = d[@"oauth_verifier"];
+    // call - (void)setOAuthToken: oauthVerifier: from ViewController
     ViewController *vc = ((UINavigationController *)[self.window rootViewController]).viewControllers[0];
     [vc setOAuthToken:token oauthVerifier:verifier];
     

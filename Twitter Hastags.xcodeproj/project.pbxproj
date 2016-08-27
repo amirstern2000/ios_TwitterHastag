@@ -161,6 +161,7 @@
 		BC6099261D6C94D5003AF857 /* Twitter Hastags */ = {
 			isa = PBXGroup;
 			children = (
+				BC6099711D718150003AF857 /* Model */,
 				BC6099651D6F6143003AF857 /* Resource */,
 				BC60992A1D6C94D6003AF857 /* AppDelegate.h */,
 				BC60992B1D6C94D6003AF857 /* AppDelegate.m */,
@@ -169,8 +170,6 @@
 				BC6099351D6C94D6003AF857 /* LaunchScreen.storyboard */,
 				BC6099381D6C94D6003AF857 /* Info.plist */,
 				BC6099271D6C94D5003AF857 /* Supporting Files */,
-				BC6099601D6CEBF8003AF857 /* HashTag.h */,
-				BC6099611D6CEBF8003AF857 /* HashTag.m */,
 			);
 			path = "Twitter Hastags";
 			sourceTree = "<group>";
@@ -222,6 +221,15 @@
 				BC6099681D6F618B003AF857 /* TweetCell.m */,
 			);
 			name = Cell;
+			sourceTree = "<group>";
+		};
+		BC6099711D718150003AF857 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BC6099601D6CEBF8003AF857 /* HashTag.h */,
+				BC6099611D6CEBF8003AF857 /* HashTag.m */,
+			);
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
